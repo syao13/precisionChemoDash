@@ -21,6 +21,10 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title = 'MeCan'
 
+model_dir = 'models/'
+model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
+models = [joblib.load(i) for i in model_paths]
+#model = joblib.load("./finalized_model.sav")
 
 app.layout = html.Div(children=[
     html.H1(children='Welcome to MeCan!'),
@@ -75,9 +79,8 @@ def parse_contents(contents, filename, date):
     return html.Div([
                     html.H5("File name: " + filename),
                     html.H6("Last modified time: " + str(datetime.datetime.fromtimestamp(date))),
-                     #html.H7("Prediction: " + str(ic50)),
                      
-                     #html.Div(', '.join([str(i) for i in ic50s])),
+                    html.Div(', '.join([str(i) for i in ic50s])),
                      
                     dash_table.DataTable(
                                        data=df.to_dict('records'),
@@ -115,10 +118,6 @@ def update_years_of_experience_input(years_of_experience):
 
 
 if __name__ == '__main__':
-    model_dir = 'models/'
-    model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
-    models = [joblib.load(i) for i in model_paths]
-    #model = joblib.load("./finalized_model.sav")
     app.run_server(debug=True)
 
 
