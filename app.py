@@ -68,9 +68,9 @@ def parse_contents(contents, filename, date):
         return html.Div([
                      'There was an error processing this file.'
                      ])
-#ic50s = []
-#    for model in models:
-#        ic50s.append(model.predict(df.T)[1])
+    ic50s = []
+        for model in models:
+        ic50s.append(model.predict(df.T)[1])
 
     return html.Div([
                     html.H5("File name: " + filename),
@@ -115,7 +115,7 @@ def update_years_of_experience_input(years_of_experience):
 
 
 if __name__ == '__main__':
-    model_dir = './models/'
+    model_dir = 'models/'
     model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
     models = [joblib.load(i) for i in model_paths]
     #model = joblib.load("./finalized_model.sav")
