@@ -1,0 +1,5 @@
+starter_app.py
+venv
+*.pyc
+.DS_Store
+.env
