@@ -68,16 +68,16 @@ def parse_contents(contents, filename, date):
         return html.Div([
                      'There was an error processing this file.'
                      ])
-    ic50s = []
-    for model in models:
-        ic50s.append(model.predict(df.T)[1])
+#ic50s = []
+#    for model in models:
+#        ic50s.append(model.predict(df.T)[1])
 
     return html.Div([
                     html.H5("File name: " + filename),
                     html.H6("Last modified time: " + str(datetime.datetime.fromtimestamp(date))),
                      #html.H7("Prediction: " + str(ic50)),
                      
-                    html.Div(', '.join([str(i) for i in ic50s])),
+                     #html.Div(', '.join([str(i) for i in ic50s])),
                      
                     dash_table.DataTable(
                                        data=df.to_dict('records'),
