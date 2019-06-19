@@ -69,7 +69,7 @@ def parse_contents(contents, filename, date):
                      'There was an error processing this file.'
                      ])
     ic50s = []
-        for model in models:
+    for model in models:
         ic50s.append(model.predict(df.T)[1])
 
     return html.Div([
