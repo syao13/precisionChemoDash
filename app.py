@@ -23,6 +23,8 @@ app.title = 'MeCan'
 model_dir = 'models/'
 model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
 models = [joblib.load(i) for i in model_paths]
+with open('conf/parms.json') as infile:
+    params = json.load(infile)
 opts = [{'label' : "patient {}".format(i), 'value' : "patient{}".format(i)} for i in range(1,4)]
 
 
@@ -84,7 +86,7 @@ app.layout = html.Div(children=[
 def update_output(patient_num, list_of_contents, list_of_names):
     if patient_num is not None:
         filepath = 'examples/' + str(patient_num) + '.csv'
-        df = pd.read_csv(filepath, header=None)
+        df = pd.read_csv(filepath, header=None, index_col=0)
 
         return run_models(patient_num + '.csv', df)
     if list_of_contents is not None:
@@ -113,12 +115,16 @@ def parse_contents(contents, filename):
 
 def run_models(filename, df):
     ic50s = []
-    for model in models:
-        ic50s.append(model.predict(df.T)[1])
     drug_names = [i[7:-10] for i in model_paths]
-    print(drug_names)
-    df1 = pd.DataFrame({'Drug Name': drug_names,
-                      'IC50': ic50s})
+    for i, model in enumerate(models):
+        drug_name = drug_names[i]
+        x = df.loc[params[drug_name]]
+        x = x.fillna(0)
+        ic50s.append(model.predict(x.T)[1])
+    
+    idx = np.array(ic50s).argsort()[:10]
+    df1 = pd.DataFrame({'Drug Name': [drug_names[i] for i in idx],
+                      'IC50': [ic50s[i] for i in idx]})
 
     return html.Div([
                      html.H5('Input from: ' + filename),
