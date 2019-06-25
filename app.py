@@ -127,13 +127,13 @@ def run_models(filename, df):
         drug_name = drug_names[i]
         x = df.loc[params[drug_name]]
         x = x.fillna(0)
-        ic50s.append(format(model.predict(x.T)[0], '.2f'))
+        ic50s.append(model.predict(x.T)[0])
         genes.append(', '.join(params[drug_name][-10:]))
     
     idx = np.array(ic50s).argsort()[:10]
     df1 = pd.DataFrame({'Rank': list(range(1,11)),
                        'Drug Name': [drug_names[i] for i in idx],
-                       'IC50': [ic50s[i] for i in idx],
+                       'IC50': [format(ic50s[i], '.2f') for i in idx],
                        'Ten Most Important Genes': [genes[i] for i in idx]
                        })
 
@@ -143,8 +143,12 @@ def run_models(filename, df):
                      dash_table.DataTable(
                                           data=df1.to_dict('records'),
                                           columns=[{"name": i, "id": i} for i in df1.columns],
-                                          style_cell = {'font_size': '16px', 'text_align': 'left'},
-                                          style_data={'whiteSpace': 'normal'}
+                                          style_cell = {'font_size': '16px', 'text_align': 'center'},
+                                          style_data={'whiteSpace': 'normal'},
+                                          style_cell_conditional=[
+                                                                  {'if': {'column_id': 'Ten Most Important Genes'},
+                                                                  'width': '60%'}
+                                                                  ]
                                           ),
                      
                      html.H6('Input from: ' + filename),
