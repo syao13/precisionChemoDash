@@ -3,7 +3,9 @@ import datetime
 import io
 from os import listdir
 from os.path import isfile, join
+import json
 
+import numpy as np
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -23,6 +25,10 @@ app.title = 'MeCan'
 model_dir = 'models/'
 model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
 models = [joblib.load(i) for i in model_paths]
+#models=[]
+#for i in model_paths:
+    #print(i)
+#    models.append(joblib.load(i))
 with open('conf/parms.json') as infile:
     params = json.load(infile)
 opts = [{'label' : "patient {}".format(i), 'value' : "patient{}".format(i)} for i in range(1,4)]
@@ -102,7 +108,7 @@ def parse_contents(contents, filename):
     try:
         if 'csv' in filename:
             # Assume that the user uploaded a CSV file
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), header=None)
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), header=None, index_col=0)
         elif 'xls' in filename or 'xlsx' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
@@ -115,29 +121,33 @@ def parse_contents(contents, filename):
 
 def run_models(filename, df):
     ic50s = []
+    genes = []
     drug_names = [i[7:-10] for i in model_paths]
     for i, model in enumerate(models):
         drug_name = drug_names[i]
         x = df.loc[params[drug_name]]
         x = x.fillna(0)
-        ic50s.append(model.predict(x.T)[1])
+        ic50s.append(format(model.predict(x.T)[0], '.2f'))
+        genes.append(', '.join(params[drug_name][-10:]))
     
     idx = np.array(ic50s).argsort()[:10]
-    df1 = pd.DataFrame({'Drug Name': [drug_names[i] for i in idx],
-                      'IC50': [ic50s[i] for i in idx]})
+    df1 = pd.DataFrame({'Rank': list(range(1,11)),
+                       'Drug Name': [drug_names[i] for i in idx],
+                       'IC50': [ic50s[i] for i in idx],
+                       'Ten Most Important Genes': [genes[i] for i in idx]
+                       })
 
     return html.Div([
-                     html.H5('Input from: ' + filename),
+                     html.H3('The top 10 most sensitive chemotheraputic drugs', style={'textAlign': 'center'}),
                      
                      dash_table.DataTable(
                                           data=df1.to_dict('records'),
                                           columns=[{"name": i, "id": i} for i in df1.columns],
-                                          style_cell = {
-                                          'font_size': '16px',
-                                          'text_align': 'center'
-                                          }
+                                          style_cell = {'font_size': '16px', 'text_align': 'left'},
+                                          style_data={'whiteSpace': 'normal'}
                                           ),
                      
+                     html.H6('Input from: ' + filename),
                      html.Hr(),  # horizontal line
                      ])
 
