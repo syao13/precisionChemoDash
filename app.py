@@ -35,7 +35,8 @@ opts = [{'label' : "patient {}".format(i), 'value' : "patient{}".format(i)} for 
 
 
 app.layout = html.Div(children=[
-                                html.H1(children='Welcome to MeCan!', style={'textAlign': 'center', 'backgroundColor':'#98C0B9'}),
+                                html.H1(children='Welcome to Precision Chemotherapy Recommander!',
+                                        style={'textAlign': 'center', 'backgroundColor':'#98C0B9'}),
                                  
     html.Div(children='''
     Find out your personalized sensitivity to the common chemotheraputic drugs.
