@@ -35,11 +35,11 @@ opts = [{'label' : "patient {}".format(i), 'value' : "patient{}".format(i)} for 
 
 
 app.layout = html.Div(children=[
-                                html.H1(children='Welcome to Precision Chemotherapy Recommander!',
+                                html.H1(children='Welcome to Precision Chemotherapy Recommender!',
                                         style={'textAlign': 'center', 'backgroundColor':'#98C0B9'}),
                                  
     html.Div(children='''
-    Find out your personalized sensitivity to the common chemotheraputic drugs.
+    Find out the personalized sensitivity to the common chemotheraputic drugs.
     ''', style={'fontSize': 24, 'marginBottom': '1.5em'}),
                                 
     html.Div(children='''Select to see an examples, or upload your gene expression file:''',
