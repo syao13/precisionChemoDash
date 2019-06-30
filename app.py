@@ -22,27 +22,24 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 app.title = 'MeCan'
 
+# Setting up the saved models and important gene parameters
 model_dir = 'models/'
-model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f))]
+model_paths = [join(model_dir, f) for f in listdir(model_dir) if isfile(join(model_dir, f)) and 'sav' in f]
 models = [joblib.load(i) for i in model_paths]
-#models=[]
-#for i in model_paths:
-    #print(i)
-#    models.append(joblib.load(i))
 with open('conf/parms.json') as infile:
     params = json.load(infile)
 opts = [{'label' : "patient {}".format(i), 'value' : "patient{}".format(i)} for i in range(1,4)]
 
 
 app.layout = html.Div(children=[
-                                html.H1(children='Welcome to Precision Chemotherapy Recommender!',
+                                html.H1(children='Welcome to the Precision Chemotherapy Recommender!',
                                         style={'textAlign': 'center', 'backgroundColor':'#98C0B9'}),
                                  
     html.Div(children='''
-    Find out the personalized sensitivity to the common chemotheraputic drugs.
+    Find out the personalized sensitivity to common chemotheraputic drugs.
     ''', style={'fontSize': 24, 'marginBottom': '1.5em'}),
                                 
-    html.Div(children='''Select to see an examples, or upload your gene expression file:''',
+    html.Div(children='''Select to see an example, or upload your gene expression file:''',
              style={'fontSize': 18}),
 
     html.Div([
@@ -60,6 +57,8 @@ app.layout = html.Div(children=[
                                }
                                )
                         ],style={'width': '48%', 'display': 'inline-block'}),
+              html.Div(children='''-or-''',
+                       style={'width': '4%', 'textAlign': 'center', 'display': 'inline-block'}),
               html.Div([
                   dcc.Upload(
                              id='upload-data',
