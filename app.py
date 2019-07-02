@@ -39,9 +39,9 @@ app.layout = html.Div(children=[
     Find out the personalized sensitivity to common chemotheraputic drugs.
     ''', style={'fontSize': 24, 'marginBottom': '1.5em'}),
                                 
-    html.Div(children='''Select to see an example, or upload your gene expression file:''',
-             style={'fontSize': 18}),
-
+    html.Div(children='''Select to see an example, or upload a gene expression file:''',
+             style={'fontSize': 20}),
+                                
     html.Div([
               html.Div([
                   dcc.Dropdown(
@@ -124,11 +124,15 @@ def run_models(filename, df):
     genes = []
     drug_names = [i[7:-10] for i in model_paths]
     for i, model in enumerate(models):
-        drug_name = drug_names[i]
-        x = df.loc[params[drug_name]]
-        x = x.fillna(0)
-        ic50s.append(model.predict(x.T)[0])
-        genes.append(', '.join(params[drug_name][-10:]))
+        try:
+            drug_name = drug_names[i]
+            x = df.loc[params[drug_name]]
+            x = x.fillna(0)
+            ic50s.append(model.predict(x.T)[0])
+            genes.append(', '.join(params[drug_name][:-11:-1]))
+        except:
+            ic50s.append(100)
+            genes.append("")
     
     idx = np.array(ic50s).argsort()[:10]
     df1 = pd.DataFrame({'Rank': list(range(1,11)),
